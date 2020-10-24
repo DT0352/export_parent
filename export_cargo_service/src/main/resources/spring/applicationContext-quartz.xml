@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+       	http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task.xsd
+">
+
+
+    <context:component-scan base-package="com.itheima.service.cargo.job"/>
+    <task:annotation-driven/>
+    <!--
+
+        &lt;!&ndash;1.配置Job：自定义java类 &ndash;&gt;
+        <bean id="myJob" class="com.itheima.service.cargo.impl.ExportServiceImpl"></bean>
+
+
+        &lt;!&ndash;2.配置JobDetail：执行任务来的方法&ndash;&gt;
+        <bean id="myJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+            &lt;!&ndash;1.确定任务类&ndash;&gt;
+            <property name="targetObject" ref="myJob"/>
+            &lt;!&ndash;2.确认任务的方法&ndash;&gt;
+            <property name="targetMethod" value="findExportResult"></property>
+        </bean>
+
+
+        &lt;!&ndash;3.配置Trigger：根据时间规则，触发方法执行&ndash;&gt;
+        <bean id="myTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+            &lt;!&ndash;1.指定时间规则&ndash;&gt;
+            <property name="cronExpression" value="* * * * * ?"></property>
+            &lt;!&ndash;2.指定JobDetail&ndash;&gt;
+            <property name="jobDetail" ref="myJobDetail"></property>
+        </bean>
+
+        &lt;!&ndash;4.配置Scheduler：统一管理配置trigger&ndash;&gt;
+        <bean id="调度器id" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+            <property name="triggers">
+                <array>
+                    <ref bean="myTrigger"></ref>
+                </array>
+            </property>
+        </bean>
+    -->
+
+</beans>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- filter-name这个名字的值来自于web.xml中filter的名字 -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <!--认证不通过, 跳转的页面 -->
+        <property name="loginUrl" value="/login.jsp"></property>
+        <!--授权不通过, 跳转的页面 -->
+        <property name="unauthorizedUrl" value="/unauthorized.jsp"></property>
+        <!--拦截规则: 从上向下依次匹配,一旦匹配成功其中一个,匹配结束-->
+        <property name="filterChainDefinitions">
+            <value>
+                /login.jsp = anon
+                /css/** = anon
+                /img/** = anon
+                /plugins/** = anon
+                /make/** = anon
+                /login.do = anon
+                <!--
+                    URL=perms["权限标识"]
+                    当前访问的用户只有有  权限标识  的权限的时候,才能访问URL对应的资源
+                    注意位置必须在/**的上面
+                     /company/list.do = perms["企业管理"]
+                -->
+
+                <!--3. 切换认证过滤器-->
+                /system/dept/edit.do = myPerms["新增部门","删除部门"]
+
+                /** = authc
+            </value>
+        </property>
+
+
+        <!-- 2 将自定义的过滤器加入到Shiro的过滤器链中-->
+        <property name="filters">
+            <map>
+                <!--key就是当前过滤器的一个唯一标识,类似于anon authc perms-->
+                <entry key="myPerms" value-ref="myPermissionsAuthorizationFilter"/>
+            </map>
+        </property>
+    </bean>
+
+
+    <!--1 将自定义的过滤器声明到Spring的容器中-->
+    <bean id="myPermissionsAuthorizationFilter" class="com.itheima.web.filters.MyPermissionsAuthorizationFilter"/>
+
+
+    <!-- 引用自定义的realm -->
+    <bean id="saasRealm" class="com.itheima.web.realm.SaasRealm"/>
+
+    <!--授权数据的缓存服务管理器-->
+    <bean id="cacheManager" class="org.apache.shiro.cache.MemoryConstrainedCacheManager"/>
+
+    <!-- 安全管理器 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="saasRealm"/>
+        <property name="cacheManager" ref="cacheManager"/>
+    </bean>
+
+    <!--下面所有内容为 shiro注解使用-->
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+          depends-on="lifecycleBeanPostProcessor">
+        <property name="proxyTargetClass" value="true"/>
+    </bean>
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+
+</beans>

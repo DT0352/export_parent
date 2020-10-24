@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<HTML>
+<HEAD>
+    <TITLE> ZTREE DEMO </TITLE>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!--1) 切换ztree需要的文件路径-->
+    <script src="plugins/ztree/js/jquery-1.4.4.min.js"></script>
+    <script src="plugins/ztree/js/jquery.ztree.all-3.5.js"></script>
+    <link rel="stylesheet" href="plugins/ztree/css/zTreeStyle/zTreeStyle.css">
+    <link rel="stylesheet" href="plugins/ztree/css/demo.css">
+
+    <SCRIPT LANGUAGE="JavaScript">
+        // 声明树的对象
+        var zTreeObj;
+        // 声明一个json对象,用于存储树的配置
+        var setting = {
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: "id",
+                    pIdKey: "pId",
+                    rootPId: 0
+                }
+            },
+            check: {
+                enable: true
+            }
+        };
+        // zTree的数据属性
+        //checked: true  默认初始化的树的时候勾选某个节点
+        var zNodes = [
+            {id: 1, pid: 0, name: "父节点1"},
+            {id: 11, pId: 1, name: "子节点1", checked: true},
+            {id: 12, pId: 1, name: "子节点2"}
+        ];
+        //初始化树
+        $(document).ready(function () {
+            //参数一: 树的位置  参数二:配置参数   参数三: 树的数据
+            zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+
+            // expandAll 展开树的所有节点
+            zTreeObj.expandAll(true);
+        });
+    </SCRIPT>
+</HEAD>
+<BODY>
+<!--2) 准备一个div, 放置这棵树的一个位置-->
+<div>
+    <ul id="treeDemo" class="ztree"></ul>
+</div>
+
+
+<button id="btn">保存</button>
+
+<script>
+    $("#btn").click(function () {
+        //getCheckedNodes(true)  获取所有选中的节点
+        var nodes = zTreeObj.getCheckedNodes(true);
+        alert(nodes.length);
+    })
+</script>
+</BODY>
+</HTML>

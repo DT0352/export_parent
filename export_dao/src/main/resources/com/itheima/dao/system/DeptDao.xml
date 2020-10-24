@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.dao.system.DeptDao">
+
+    <!--自定义结果集映射-->
+    <resultMap id="BaseResultMap" type="com.itheima.domain.system.Dept">
+        <id property="id" column="dept_id"/>
+        <result property="deptName" column="dept_name"/>
+
+        <result property="state" column="state"/>
+        <result property="companyId" column="company_id"/>
+        <result property="companyName" column="company_name"/>
+
+        <!--这个有问题  暂时不处理-->
+        <!--
+            已知: parent_id  100
+            目标: 获取到父部门对象
+                select * from pe_dept where dept_id = 100
+        -->
+        <!--<result property="parent" column="parent_id"/>-->
+        <!--
+            column  已知道的数据库返回的条件
+            property  需要根据条件获取到的对象要封装进入当前对象的哪个属性
+            select   要调用的方法
+        -->
+        <association property="parent" column="parent_id" select="findById"></association>
+    </resultMap>
+
+    <insert id="save">
+         insert into pe_dept (
+            dept_id,
+            dept_name,
+            parent_id,
+            state,
+            company_id,
+            company_name
+         ) values (
+            #{id},
+            #{deptName},
+            #{parent.id},
+            #{state},
+            #{companyId},
+            #{companyName}
+         );
+    </insert>
+
+    <update id="update">
+        update pe_dept
+        <set>
+            <if test="deptName != null and deptName != ''">
+                dept_name=#{deptName},
+            </if>
+            parent_id=#{parent.id},
+            <if test="state != null">
+                state=#{state},
+            </if>
+            <if test="companyId != null and companyId != ''">
+                company_id=#{companyId},
+            </if>
+            <if test="companyName != null and companyName != ''">
+                company_name=#{companyName},
+            </if>
+        </set>
+        where dept_id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from  pe_dept where dept_id = #{id}
+    </delete>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select * from pe_dept where company_id = #{companyId}
+    </select>
+
+    <select id="findById" resultMap="BaseResultMap">
+        select * from pe_dept where dept_id = #{id}
+    </select>
+
+    <select id="findChildrenDept" resultMap="BaseResultMap">
+        select * from pe_dept where parent_id = #{id}
+    </select>
+
+</mapper>
